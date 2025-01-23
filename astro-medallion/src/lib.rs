@@ -38,11 +38,11 @@ impl Error for MyError {
 
 pub struct SpiFesOnlyWrite<'d>(pub Spi<'d, Blocking>);
 
-impl<'d> ErrorType for SpiFesOnlyWrite<'d> {
+impl ErrorType for SpiFesOnlyWrite<'_> {
     type Error = MyError;
 }
 
-impl<'d> SpiDevice for SpiFesOnlyWrite<'d> {
+impl SpiDevice for SpiFesOnlyWrite<'_> {
     fn transaction(&mut self, operations: &mut [Operation<'_, u8>]) -> Result<(), Self::Error> {
         for x in operations {
             match x {

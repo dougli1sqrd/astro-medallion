@@ -47,20 +47,24 @@
 use core::{f64, fmt::Debug};
 
 use alloc;
-use astro::{angle::{self, TWO_PI}, coords::EclPoint};
+use alloc::vec;
+use alloc::vec::Vec;
+use astro::{
+    angle::TWO_PI,
+    coords::EclPoint,
+};
 use core_maths::CoreFloat;
 use embedded_hal::{
     digital::{OutputPin, PinState},
     spi::SpiDevice,
 };
-use alloc::vec;
-use alloc::vec::Vec;
 
-#[cfg(not(feature = "std"))]
-use esp_println::println;
 
 use crate::{
-    astronomy::{self, angular_diameter, diameter, jupiter, mars, mercury, moon, neptune, saturn, sun, uranus, venus, within_2pi},
+    astronomy::{
+        angular_diameter, diameter, jupiter, mars, mercury, moon, neptune, saturn, sun,
+        uranus, venus, within_2pi,
+    },
     rgb::{RGBWrite, RGB},
     Interval,
 };
@@ -142,7 +146,7 @@ impl<CLK: OutputPin, D: OutputPin, FL: OutputPin, RS: OutputPin>
         loop {
             let b = d / 8;
             let bi = 7 - d % 8;
-            s[b] = s[b] | 1 << bi;
+            s[b] |= 1 << bi;
             if d == end {
                 break;
             }
@@ -229,8 +233,10 @@ const BLUE: RGB = RGB::new(0, 0, 32);
 const YELLOW: RGB = RGB::new(24, 18, 0);
 const PURPLE: RGB = RGB::new(24, 0, 24);
 const ORANGE: RGB = RGB::new(32, 10, 0);
+#[allow(unused)]
 const CYAN: RGB = RGB::new(0, 24, 24);
 const TEAL: RGB = RGB::new(0, 24, 12);
+#[allow(unused)]
 const BRIGHT_YELLOW: RGB = RGB::new(24, 24, 6);
 const YELLOW_GREEN: RGB = RGB::new(16, 24, 0);
 const LOW_WHITE: RGB = RGB::new(20, 16, 24);
@@ -359,12 +365,16 @@ impl<SPI> Planets<SPI> {
         for p in self.slice_mut() {
             let pos = p.pos;
             if m.contains_key(&pos) {
-                m.entry(p.pos).and_modify(|x: &mut Vec<&mut Planet>| x.push(p));
+                m.entry(p.pos)
+                    .and_modify(|x: &mut Vec<&mut Planet>| x.push(p));
             } else {
                 m.insert(p.pos, vec![p]);
             }
         }
-        m.into_iter().filter(|(_, v)| v.len() > 1).map(|(_, v)| v).collect()
+        m.into_iter()
+            .filter(|(_, v)| v.len() > 1)
+            .map(|(_, v)| v)
+            .collect()
     }
 
     pub fn slice_mut(&mut self) -> [&mut Planet; 9] {
@@ -417,16 +427,16 @@ impl<SPI> Planets<SPI> {
     fn near_new_sign(&self, dist: f64, diameter: f64, lon: f64) -> Option<isize> {
         const SIGN_ANGLE: f64 = TWO_PI / 12.0;
         let a = angular_diameter(dist, diameter);
-        let an = lon - a/2.0;
-        let x = if SIGN_ANGLE - an.rem_euclid(SIGN_ANGLE) < a {
+        let an = lon - a / 2.0;
+        
+
+        if SIGN_ANGLE - an.rem_euclid(SIGN_ANGLE) < a {
             // Find out what percent of the angular diameter we have left
             let p = (SIGN_ANGLE - an.rem_euclid(SIGN_ANGLE)) / a;
             Some(((512.0 * p).max(8.0)) as isize)
         } else {
             None
-        };
-        
-        x
+        }
     }
 
     pub fn update_date(&mut self, jd: f64) -> alloc::vec::Vec<(&str, f64, f64)> {
@@ -503,15 +513,15 @@ impl<SPI> Planets<SPI> {
 
 impl<SPI> Debug for Planets<SPI> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "moon: {:?}\n", self.moon.pos)?;
-        write!(f, "mercury: {:?}\n", self.mercury.pos)?;
-        write!(f, "venus: {:?}\n", self.venus.pos)?;
-        write!(f, "sun: {:?}\n", self.sun.pos)?;
-        write!(f, "mars: {:?}\n", self.mars.pos)?;
-        write!(f, "jupiter: {:?}\n", self.jupiter.pos)?;
-        write!(f, "saturn: {:?}\n", self.saturn.pos)?;
-        write!(f, "uranus: {:?}\n", self.uranus.pos)?;
-        write!(f, "neptune: {:?}\n", self.neptune.pos)?;
+        writeln!(f, "moon: {:?}", self.moon.pos)?;
+        writeln!(f, "mercury: {:?}", self.mercury.pos)?;
+        writeln!(f, "venus: {:?}", self.venus.pos)?;
+        writeln!(f, "sun: {:?}", self.sun.pos)?;
+        writeln!(f, "mars: {:?}", self.mars.pos)?;
+        writeln!(f, "jupiter: {:?}", self.jupiter.pos)?;
+        writeln!(f, "saturn: {:?}", self.saturn.pos)?;
+        writeln!(f, "uranus: {:?}", self.uranus.pos)?;
+        writeln!(f, "neptune: {:?}", self.neptune.pos)?;
         Ok(())
     }
 }

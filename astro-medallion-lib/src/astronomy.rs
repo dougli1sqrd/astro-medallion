@@ -89,7 +89,7 @@ pub fn eq_from_hz(az: f64, alt: f64, lst: f64, lat: f64) -> EqPoint {
     // EqPoint { asc: lst - lh, dec }
     let dec = dec_frm_hz(az, alt, lat);
     let ha = hr_angl_frm_hz(az, alt, lat);
-    return EqPoint { asc: lst - ha, dec };
+    EqPoint { asc: lst - ha, dec }
 }
 
 pub fn jd(year: i16, month: Month, day: u8, hr: u8, min: u8, sec: f64, time_zone: f64) -> f64 {
@@ -109,8 +109,8 @@ pub fn jd(year: i16, month: Month, day: u8, hr: u8, min: u8, sec: f64, time_zone
     let julian_day = astro::time::julian_day(&date);
     let delta_t = astro::time::delta_t(date.year.into(), date.month as u8);
 
-    let jd = astro::time::julian_ephemeris_day(julian_day, delta_t);
-    jd
+    
+    astro::time::julian_ephemeris_day(julian_day, delta_t)
 }
 
 fn convert_to_geo(jd: f64, pos: SphericalCoordinates) -> (EclPoint, f64) {
@@ -127,7 +127,7 @@ fn convert_to_geo(jd: f64, pos: SphericalCoordinates) -> (EclPoint, f64) {
     (
         EclPoint {
             long: within_2pi(lon),
-            lat: lat,
+            lat,
         },
         d,
     )

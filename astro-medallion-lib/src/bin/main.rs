@@ -1,7 +1,13 @@
 use core::f64;
 
 use astro::{
-    angle::{hms_frm_deg, limit_to_360}, coords::{self, EclPoint}, ecl_frm_eq, ecliptic::mn_oblq_IAU, eq_frm_ecl, planet::geocent_geomet_ecl_coords, time::mn_sidr
+    angle::{hms_frm_deg, limit_to_360},
+    coords::{self, EclPoint},
+    ecl_frm_eq,
+    ecliptic::mn_oblq_IAU,
+    eq_frm_ecl,
+    planet::geocent_geomet_ecl_coords,
+    time::mn_sidr,
 };
 use astro_medallion_lib::astronomy::{east_horizon, eq_from_hz, west_horizon, zenith, Within2Pi};
 use vsop87::vsop87b;
@@ -95,7 +101,11 @@ fn main() {
 
     let jd = astro::time::julian_ephemeris_day(julian_day, delta_t);
     let foo = zenith2(jd, -122.0_f64.to_radians(), 37.77_f64.to_radians());
-    println!("Zenith at midnight jan 5 (Lon {}, Lat {})", foo.long.to_degrees(), foo.lat.to_degrees());
+    println!(
+        "Zenith at midnight jan 5 (Lon {}, Lat {})",
+        foo.long.to_degrees(),
+        foo.lat.to_degrees()
+    );
     // println!("free_eq (RA {}, DEC {})", foo_asc.to_degrees(), foo_dec.to_degrees());
     for a in 0..36 {
         let dec_day = astro::time::decimal_day(&day_start) + a as f64 * 40.0 / (60.0 * 24.0);
@@ -115,7 +125,7 @@ fn main() {
         let z = zenith(jd, local_long.to_radians(), lat);
         let west = west_horizon(jd, local_long.to_radians(), lat);
 
-        // println!("Time: {:?} East: {}, Zenith: {}, West: {}", hms_from_decimal_day(dec_day, -8.0), east.long.in2pi().to_degrees(), z.long.in2pi().to_degrees(), west.long.in2pi().to_degrees());
+        println!("Time: {:?} East: {}, Zenith: {}, West: {}", hms_from_decimal_day(dec_day, -8.0), east.long.in2pi().to_degrees(), z.long.in2pi().to_degrees(), west.long.in2pi().to_degrees());
     }
     println!("Experiment to go from ecliptic to equatorial coordinates and back again");
 
@@ -176,15 +186,29 @@ fn main() {
     );
 
     println!("VSOP87");
-    let marspos= vsop87b::mars(jd);
+    let marspos = vsop87b::mars(jd);
     let earthpos = vsop87b::earth(jd);
-    let (mlon, mlat, md, t) = geocent_geomet_ecl_coords(earthpos.longitude(), earthpos.latitude(), earthpos.distance(), marspos.longitude(), marspos.latitude(), marspos.distance());
-    println!("Helio Mars lon: {}, lat: {}, dist: {}", marspos.longitude().to_degrees(), marspos.latitude().to_degrees(), marspos.distance());
-    println!("Geo Mars lon: {}, lat: {}, dist: {}, t: {}",mlon.to_degrees(), mlat.to_degrees(), md, t);
-
-    
-
-
+    let (mlon, mlat, md, t) = geocent_geomet_ecl_coords(
+        earthpos.longitude(),
+        earthpos.latitude(),
+        earthpos.distance(),
+        marspos.longitude(),
+        marspos.latitude(),
+        marspos.distance(),
+    );
+    println!(
+        "Helio Mars lon: {}, lat: {}, dist: {}",
+        marspos.longitude().to_degrees(),
+        marspos.latitude().to_degrees(),
+        marspos.distance()
+    );
+    println!(
+        "Geo Mars lon: {}, lat: {}, dist: {}, t: {}",
+        mlon.to_degrees(),
+        mlat.to_degrees(),
+        md,
+        t
+    );
 }
 
 pub fn hms_from_decimal_day(decimal_day: f64, timezone: f64) -> (i32, i32, f64) {

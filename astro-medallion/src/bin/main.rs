@@ -1,44 +1,38 @@
 #![no_std]
 #![no_main]
 
-use core::cell::{RefCell};
+use core::cell::RefCell;
 use core::f64;
 use core::ops::{AddAssign, Deref};
 
-use alloc::format;
 use astro_medallion::{int_to_month, SpiFesOnlyWrite};
-use astro_medallion_lib::astro::coords::EclPoint;
 use astro_medallion_lib::astro::time::Month;
 use astro_medallion_lib::astronomy::{
-    east_horizon_alt, horizon_longitudes, jd, within_2pi, zenith
+    east_horizon_alt, horizon_longitudes, jd, within_2pi, zenith,
 };
 use astro_medallion_lib::display::{
-    self, lerp_rgb, position, DirectHorizonControl, HorizonDisplay, HorizonLEDs, Planets, BLACK, EARTH, JUPITER, MARS, MERCURY, MOON, NEPTUNE, SATURN, SUN, URANUS, VENUS
+    lerp_rgb, DirectHorizonControl, HorizonDisplay, Planets, BLACK,
 };
-use astro_medallion_lib::rgb::{RGBWrite, RGB};
+use astro_medallion_lib::rgb::RGBWrite;
 use chrono::TimeDelta;
 use critical_section::Mutex;
-use embedded_hal::delay::DelayNs;
 use esp_backtrace as _;
-use esp_hal::delay::Delay;
 use esp_hal::gpio::{Level, Output};
 use esp_hal::i2c::master::I2c;
 use esp_hal::interrupt::Priority;
 use esp_hal::peripheral::Peripheral;
-use esp_hal::peripherals::{Interrupt, SPI2, TIMG0};
+use esp_hal::peripherals::{Interrupt, TIMG0};
 use esp_hal::riscv::asm::wfi;
 use esp_hal::spi::master::{Config, Spi};
 use esp_hal::spi::SpiMode;
 use esp_hal::timer::timg::{Timer, TimerGroup, TimerX};
-use esp_hal::uart::{self, Uart, UartRx, UartTx};
-use esp_hal::{i2c, interrupt, peripheral, prelude::*, Blocking};
+use esp_hal::uart::{Uart, UartRx, UartTx};
+use esp_hal::{i2c, interrupt, prelude::*, Blocking};
 use esp_println::println;
-use log::info;
 use mcp794xx::ic::Mcp7940n;
 use mcp794xx::interface::I2cInterface;
-use mcp794xx::{DateTimeAccess, Datelike, Hours, Mcp794xx, NaiveDate, NaiveDateTime, NaiveTime, Timelike};
+use mcp794xx::{DateTimeAccess, Datelike, Mcp794xx, NaiveDate, Timelike};
 use nb::block;
-use noline::builder::EditorBuilder;
 
 extern crate alloc;
 
@@ -49,10 +43,10 @@ const UPDATE_INTERVAL: u64 = 1000 * 60 * 20;
 // const UPDATE_INTERVAL: u64 = 1000;
 const WAKEUP_INTERVAL: u64 = 10;
 
-static TIMER0: Mutex<RefCell<Option<Timer<TimerX<TIMG0>, Blocking>>>> = Mutex::new(RefCell::new(None));
+static TIMER0: Mutex<RefCell<Option<Timer<TimerX<TIMG0>, Blocking>>>> =
+    Mutex::new(RefCell::new(None));
 
 static CURRENT_DURATION: Mutex<RefCell<u64>> = Mutex::new(RefCell::new(0));
-
 
 #[entry]
 fn main() -> ! {
@@ -65,17 +59,6 @@ fn main() -> ! {
     esp_println::logger::init_logger_from_env();
 
     esp_alloc::heap_allocator!(92 * 1024);
-
-    println!();
-    let uart0 = Uart::new_with_config(
-        peripherals.UART0,
-        uart::Config {
-            ..Default::default()
-        },
-        peripherals.GPIO20,
-        peripherals.GPIO21,
-    )
-    .unwrap();
 
     let scl = peripherals.GPIO2;
     let sda = peripherals.GPIO3;
@@ -105,14 +88,17 @@ fn main() -> ! {
                 .unwrap()
                 .and_hms_opt(DEFAULT_HMS.0, DEFAULT_HMS.1, DEFAULT_HMS.2)
                 .unwrap(),
-        ).unwrap();
+        )
+        .unwrap();
         rtc.enable().unwrap();
         rtc.write_sram_byte(0x20, TIME_SET).unwrap();
     }
 
-
     let timg0 = TimerGroup::new(peripherals.TIMG0);
-    let timer0: Timer<esp_hal::timer::timg::TimerX<<esp_hal::peripherals::TIMG0 as Peripheral>::P>, Blocking> = timg0.timer0;
+    let timer0: Timer<
+        esp_hal::timer::timg::TimerX<<esp_hal::peripherals::TIMG0 as Peripheral>::P>,
+        Blocking,
+    > = timg0.timer0;
     timer0.set_interrupt_handler(timer_interrupt);
 
     interrupt::enable(Interrupt::TG0_T0_LEVEL, Priority::Priority1).unwrap();
@@ -159,17 +145,16 @@ fn main() -> ! {
 
     let mut lerp_t = 0;
     let max_lerp = 200;
-    
 
     loop {
-        // Read the current duration, and if we're greater than the update UPDATE_INTERVAL, 
+        // Read the current duration, and if we're greater than the update UPDATE_INTERVAL,
         // then reset the duration and and read the real time clock and update as normal
         let update: bool = critical_section::with(|cs| {
             let mut d = CURRENT_DURATION.borrow(cs).borrow_mut();
             let update = *d >= UPDATE_INTERVAL;
             if update {
                 *d = 0;
-            } 
+            }
             update
         });
         if update {
@@ -196,10 +181,10 @@ fn main() -> ! {
                 }
             }
         }
-        
+
         for p in planets.slice_mut() {
             if let Some(t_max) = p.t_max {
-                p.t = (p.t + 1) % (2*t_max);
+                p.t = (p.t + 1) % (2 * t_max);
                 // println!("t_max = {t_max}, t = {}", p.t);
                 if p.t < t_max {
                     p.color = lerp_rgb(p.base, BLACK, p.t, t_max);
@@ -215,7 +200,6 @@ fn main() -> ! {
 
         wfi();
     }
-
 }
 
 #[handler]
@@ -227,59 +211,103 @@ fn timer_interrupt() {
             t.start();
         }
         // Update the wakeup duration
-        CURRENT_DURATION.borrow(cs).borrow_mut().add_assign(WAKEUP_INTERVAL);
+        CURRENT_DURATION
+            .borrow(cs)
+            .borrow_mut()
+            .add_assign(WAKEUP_INTERVAL);
     });
 }
 
-fn update_display(rtc: &mut Mcp794xx<I2cInterface<I2c<'_, Blocking>>, Mcp7940n>, lat: f64, lon: f64, horizon: &mut HorizonDisplay<Output<'_>, Output<'_>, Output<'_>, Output<'_>>, planets: &mut Planets<SpiFesOnlyWrite<'_>>) {
+fn update_display(
+    rtc: &mut Mcp794xx<I2cInterface<I2c<'_, Blocking>>, Mcp7940n>,
+    lat: f64,
+    lon: f64,
+    horizon: &mut HorizonDisplay<Output<'_>, Output<'_>, Output<'_>, Output<'_>>,
+    planets: &mut Planets<SpiFesOnlyWrite<'_>>,
+) {
     let current_time = rtc.datetime().unwrap();
     // let current_time = NaiveDate::from_ymd_opt(2025, 4, 18).unwrap().and_time(NaiveTime::from_hms_opt(16, 45, 0).unwrap());
     println!("Reading time as {}", current_time);
-    let jd = jd(current_time.year() as i16, int_to_month(current_time.month(), Month::Jan), current_time.day() as u8, current_time.hour() as u8, current_time.minute() as u8, current_time.second() as f64, -8.0);
+    let jd = jd(
+        current_time.year() as i16,
+        int_to_month(current_time.month(), Month::Jan),
+        current_time.day() as u8,
+        current_time.hour() as u8,
+        current_time.minute() as u8,
+        current_time.second() as f64,
+        -8.0,
+    );
     let (east, west) = horizon_longitudes(jd, lon, lat);
     let alt_east = east_horizon_alt(jd, lon, lat);
     let alt_west = within_2pi(alt_east + f64::consts::PI);
     let z = zenith(jd, lon, lat);
-    println!("East: {}, Z: {}, West: {}", east.to_degrees(), z.long.to_degrees(), west.to_degrees());
-    println!("AltEast: {}, AltWest: {}", alt_east.to_degrees(), alt_west.to_degrees());
+    println!(
+        "East: {}, Z: {}, West: {}",
+        east.to_degrees(),
+        z.long.to_degrees(),
+        west.to_degrees()
+    );
+    println!(
+        "AltEast: {}, AltWest: {}",
+        alt_east.to_degrees(),
+        alt_west.to_degrees()
+    );
     horizon.light_start_end(alt_east, alt_west);
 
     let _ = planets.update_date(jd);
-    
+
     let s = planets.sequence();
     planets.rgb_write.reset();
     planets.rgb_write.write(&s);
 }
 
-fn update_display_demo(rtc: &mut Mcp794xx<I2cInterface<I2c<'_, Blocking>>, Mcp7940n>, lat: f64, lon: f64, horizon: &mut HorizonDisplay<Output<'_>, Output<'_>, Output<'_>, Output<'_>>, planets: &mut Planets<SpiFesOnlyWrite<'_>>, add_min: i64) {
-    let current_time = rtc.datetime().unwrap().checked_add_signed(TimeDelta::minutes(add_min)).unwrap();
+#[allow(unused)]
+fn update_display_demo(
+    rtc: &mut Mcp794xx<I2cInterface<I2c<'_, Blocking>>, Mcp7940n>,
+    lat: f64,
+    lon: f64,
+    horizon: &mut HorizonDisplay<Output<'_>, Output<'_>, Output<'_>, Output<'_>>,
+    planets: &mut Planets<SpiFesOnlyWrite<'_>>,
+    add_min: i64,
+) {
+    let current_time = rtc
+        .datetime()
+        .unwrap()
+        .checked_add_signed(TimeDelta::minutes(add_min))
+        .unwrap();
     // let current_time = NaiveDate::from_ymd_opt(2025, 4, 18).unwrap().and_time(NaiveTime::from_hms_opt(16, 45, 0).unwrap());
     println!("Reading time as {}", current_time);
-    let jd = jd(current_time.year() as i16, int_to_month(current_time.month(), Month::Jan), current_time.day() as u8, current_time.hour() as u8, current_time.minute() as u8, current_time.second() as f64, -8.0);
+    let jd = jd(
+        current_time.year() as i16,
+        int_to_month(current_time.month(), Month::Jan),
+        current_time.day() as u8,
+        current_time.hour() as u8,
+        current_time.minute() as u8,
+        current_time.second() as f64,
+        -8.0,
+    );
     let (east, west) = horizon_longitudes(jd, lon, lat);
     let alt_east = east_horizon_alt(jd, lon, lat);
     let alt_west = within_2pi(alt_east + f64::consts::PI);
     let z = zenith(jd, lon, lat);
-    println!("East: {}, Z: {}, West: {}", east.to_degrees(), z.long.to_degrees(), west.to_degrees());
-    println!("AltEast: {}, AltWest: {}", alt_east.to_degrees(), alt_west.to_degrees());
+    println!(
+        "East: {}, Z: {}, West: {}",
+        east.to_degrees(),
+        z.long.to_degrees(),
+        west.to_degrees()
+    );
+    println!(
+        "AltEast: {}, AltWest: {}",
+        alt_east.to_degrees(),
+        alt_west.to_degrees()
+    );
     horizon.light_start_end(alt_east, alt_west);
 
     let _ = planets.update_date(jd);
-    
+
     let s = planets.sequence();
     planets.rgb_write.reset();
     planets.rgb_write.write(&s);
-}
-
-fn print_pos(name: &str, pos: (EclPoint, f64)) -> alloc::string::String {
-    let (p, d) = pos;
-    format!(
-        "{}: (Lon {}, Lat {}), distance: {}",
-        name,
-        p.long.to_degrees(),
-        p.lat.to_degrees(),
-        d
-    )
 }
 
 struct UartWrapper<'d, M> {
@@ -298,6 +326,7 @@ where
     }
 }
 
+#[allow(unused)]
 #[derive(Debug)]
 struct Error(esp_hal::uart::Error);
 
@@ -313,11 +342,11 @@ impl embedded_io::Error for Error {
     }
 }
 
-impl<'a, M> embedded_io::ErrorType for UartWrapper<'a, M> {
+impl<M> embedded_io::ErrorType for UartWrapper<'_, M> {
     type Error = Error;
 }
 
-impl<'a, M: esp_hal::Mode> embedded_io::Read for UartWrapper<'a, M> {
+impl<M: esp_hal::Mode> embedded_io::Read for UartWrapper<'_, M> {
     fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
         buf[0] = block!(self.rx.read_byte())?;
 
@@ -325,7 +354,7 @@ impl<'a, M: esp_hal::Mode> embedded_io::Read for UartWrapper<'a, M> {
     }
 }
 
-impl<'a, M: esp_hal::Mode> embedded_io::Write for UartWrapper<'a, M> {
+impl<M: esp_hal::Mode> embedded_io::Write for UartWrapper<'_, M> {
     fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
         self.tx.write_bytes(buf).map_err(Self::Error::from)
     }
