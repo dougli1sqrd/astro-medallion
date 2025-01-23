@@ -1,0 +1,18 @@
+[package]
+name = "astro-medallion-lib"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+astro = { version = "2.0.0", git = "https://github.com/dougli1sqrd/astro-rust" }
+core_maths = "0.1.0"
+embedded-hal = "1.0.0"
+esp-println = { version = "0.12.0", features = ["esp32c3"], optional = true }
+mcp794xx = "0.3.0"
+smart-leds = "0.4.0"
+smart-leds-trait = "0.3.0"
+vsop87 = { version = "3.0.0", default-features = false, features = ["no_std"] }
+
+[features]
+default = ["dep:esp-println"]
+std = []
