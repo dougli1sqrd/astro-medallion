@@ -27,7 +27,7 @@
 				(justify left top)
 			)
 		)
-		(property "Footprint" "LED_SMD:LED_Inolux_IN-PI554FCH_PLCC4_5.0x5.0mm_P3.2mm"
+		(property "Footprint" "Dialight-587:LED_Dialight587_PLCC4_5.0x5.0mm_P3.2mm"
 			(at 1.27 -7.62 0)
 			(effects
 				(font

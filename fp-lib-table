@@ -5,4 +5,7 @@
   (lib (name "Images")(type "KiCad")(uri "${KIPRJMOD}/local/Images.pretty")(options "")(descr ""))
   (lib (name "Espressif")(type "KiCad")(uri "${KIPRJMOD}/local/Espressif.pretty")(options "")(descr ""))
   (lib (name "Foo")(type "KiCad")(uri "${KIPRJMOD}/local/Foo.pretty")(options "")(descr ""))
+  (lib (name "xinglight-rgb")(type "KiCad")(uri "${KIPRJMOD}/local/xinglight-rgb.pretty")(options "")(descr ""))
+  (lib (name "Project")(type "KiCad")(uri "${KIPRJMOD}/local/Project.pretty")(options "")(descr ""))
+  (lib (name "local")(type "KiCad")(uri "${KIPRJMOD}/local")(options "")(descr ""))
 )

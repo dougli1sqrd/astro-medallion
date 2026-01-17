@@ -2,12 +2,28 @@
 
 extern crate alloc;
 
+use core::num::NonZero;
+
+use alloc::vec::Vec;
 use astro_medallion_lib::astro::time::Month;
+use chrono::{Datelike, NaiveDate, NaiveTime, Timelike};
 use embedded_hal::{
     digital::OutputPin,
     spi::{Error, ErrorKind, ErrorType, Operation, SpiBus, SpiDevice},
 };
 use esp_hal::{spi::master::Spi, Blocking};
+use esp_storage::FlashStorage;
+use embedded_storage::{ReadStorage, Storage};
+use log::{info, log};
+use serde::{Deserialize, Serialize};
+use esp_hal::prelude::*;
+
+pub mod serial;
+pub mod timing;
+pub mod cmd;
+
+pub const CONFIG_OFFSET: u32 = 0x28_0000;
+
 
 pub fn int_to_month(num: u32, default: Month) -> Month {
     match num {
@@ -25,6 +41,42 @@ pub fn int_to_month(num: u32, default: Month) -> Month {
         12 => Month::Dec,
         _ => default
     }
+}
+
+pub fn read_config(storage: &mut FlashStorage) -> astro_medallion_lib::Config {
+    // Read number of stored bytes
+    // If 0 this is the first start, and write a default config. Store the length and the default config.
+    // Read the config out and return
+    info!("Read config");
+    let mut stored = [0; 4];
+    storage.read(CONFIG_OFFSET, &mut stored).unwrap();
+    info!("Read length as {:?}", stored);
+    let length = u32::from_le_bytes(stored);
+    if length == 0 || length == u32::MAX {
+        // First time ever starting
+        info!("First Read");
+        let config = astro_medallion_lib::Config::default();
+
+        let x = postcard::to_allocvec(&config).unwrap();
+        storage
+            .write(CONFIG_OFFSET, &x.len().to_le_bytes())
+            .unwrap();
+        storage.write(CONFIG_OFFSET + 4, x.as_slice()).unwrap();
+        return config;
+    }
+    let mut rx = Vec::new();
+    rx.resize_with(length as usize, || 0);
+    storage.read(CONFIG_OFFSET + 4, &mut rx).unwrap();
+    postcard::from_bytes::<astro_medallion_lib::Config>(&rx).unwrap()
+}
+
+pub fn write_config(storage: &mut FlashStorage, config: &astro_medallion_lib::Config) {
+    info!("Write config");
+    let x = postcard::to_allocvec(&config).unwrap();
+    storage
+        .write(CONFIG_OFFSET, &x.len().to_le_bytes())
+        .unwrap();
+    storage.write(CONFIG_OFFSET + 4, &x).unwrap();
 }
 
 #[derive(Debug)]
@@ -91,3 +143,10 @@ impl<CLK: OutputPin, D: OutputPin> SpiDevice for SoftSPIWrite<CLK, D> {
         Ok(())
     }
 }
+
+
+// Read storages for Config information
+// Create config variable, which will be used throughout which has the relevant info
+// If Config is not fully defined, do some default behavior and periodically re-check storage
+//  and attempt to rebuild the config
+// If Config is fully defined, proceed in the main loop displaying astronomy info

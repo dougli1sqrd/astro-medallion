@@ -7,12 +7,15 @@ edition = "2021"
 astro = { version = "2.0.0", git = "https://github.com/dougli1sqrd/astro-rust" }
 core_maths = "0.1.0"
 embedded-hal = "1.0.0"
-esp-println = { version = "0.12.0", features = ["esp32c3"], optional = true }
+# esp-println = { version = "0.12.0", default-features = false, features = ["esp32c3", "log", "critical-section", "colors"], optional = true }
 mcp794xx = "0.3.0"
+nom = { version = "8.0.0", default-features = false, features = ["alloc"] }
 smart-leds = "0.4.0"
 smart-leds-trait = "0.3.0"
 vsop87 = { version = "3.0.0", default-features = false, features = ["no_std"] }
+chrono = { version = "0.4.39", default-features = false, features = ["alloc", "serde"] }
+serde = { version = "1.0.219", default-features = false, features = ["derive"] }
 
 [features]
-default = ["dep:esp-println"]
+# default = ["dep:esp-println"]
 std = []

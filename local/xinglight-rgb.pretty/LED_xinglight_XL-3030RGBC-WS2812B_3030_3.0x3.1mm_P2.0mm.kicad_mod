@@ -1,0 +1,244 @@
+(footprint "LED_xinglight_XL-3030RGBC-WS2812B_3030_3.0x3.1mm_P2.0mm"
+	(version 20240108)
+	(generator "pcbnew")
+	(generator_version "8.0")
+	(layer "F.Cu")
+	(descr "Addressable RGB LED by Xinglight")
+	(tags "LED RGB xinglight 3030 WS2812B")
+	(property "Reference" "REF**"
+		(at 0 -3.5 0)
+		(layer "B.SilkS")
+		(uuid "29976fa0-918e-48c1-ba81-319324267df7")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify mirror)
+		)
+	)
+	(property "Value" "LED_3030_3.0x3.1mm_P2.0mm"
+		(at 0 4 0)
+		(layer "F.Fab")
+		(uuid "11f34c85-b80f-46bd-b71d-beeef7ef25a2")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "453956eb-d61b-4468-b399-3a349961be01")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" "https://www.lcsc.com/datasheet/lcsc_datasheet_2410121315_XINGLIGHT-XL-3030RGBC-WS2812B_C5349958.pdf"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "af8ebc25-09f5-4728-90c8-7ad585d30554")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "e29d4fdc-7eec-4404-9165-4a75e440ba73")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(fp_line
+		(start -2 -1.6)
+		(end -2 1.8)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "29e21e87-9570-4986-a2af-a1b4dacb9748")
+	)
+	(fp_line
+		(start 1.6 1.8)
+		(end -2 1.8)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "0e304e33-ffab-4aa1-8aef-670c1939aa4c")
+	)
+	(fp_line
+		(start 1.6 1.8)
+		(end 2.1 1.3)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "f00f9758-8300-4154-bbb0-027b1553f25a")
+	)
+	(fp_line
+		(start 2.1 -1.6)
+		(end -2 -1.6)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "fbdfd14a-1514-4a9a-89ad-4df9399785cc")
+	)
+	(fp_line
+		(start 2.1 -1.6)
+		(end 2.1 1.3)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "107bd717-a581-4b7d-bd6e-7ac3571bdf77")
+	)
+	(fp_rect
+		(start -2.15 -1.7)
+		(end 2.2 1.9)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(fill none)
+		(layer "F.CrtYd")
+		(uuid "bf15484c-bbcd-4905-9735-bfa9a7399088")
+	)
+	(fp_line
+		(start -1.55 -1.5)
+		(end -1.55 1.5)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "c1e0f6c3-5b59-440d-a140-3852a7e264a7")
+	)
+	(fp_line
+		(start -1.55 1.5)
+		(end 1.55 1.5)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "e4c74574-4660-4fc6-b56a-3f019923dc9c")
+	)
+	(fp_line
+		(start 1.55 -1.5)
+		(end -1.55 -1.5)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "dc583704-c2f5-4fcc-8830-9be2442d535c")
+	)
+	(fp_line
+		(start 1.55 1)
+		(end 1.05 1.5)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.Fab")
+		(uuid "9ab890a4-a890-4173-a8e5-0c1d2cd4fef9")
+	)
+	(fp_line
+		(start 1.55 1.5)
+		(end 1.55 -1.5)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "90c3ef5b-455e-4d2f-aa38-e0f89bf4bf0c")
+	)
+	(fp_circle
+		(center 0 0)
+		(end 1.25 0)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill none)
+		(layer "F.Fab")
+		(uuid "83b9b0b3-69d5-4d55-b734-61b11225d74a")
+	)
+	(fp_text user "."
+		(at -2.4 -1.35 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "1dd9b978-b912-45e0-83fd-c616325b2a91")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" smd roundrect
+		(at -1.25 -1)
+		(size 1.2 1)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(roundrect_rratio 0.1)
+		(uuid "303fa036-5e50-4d6d-bb86-5cdfd4b88a9f")
+	)
+	(pad "2" smd roundrect
+		(at -1.25 1)
+		(size 1.2 1)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(roundrect_rratio 0.1)
+		(uuid "19ff1e90-56ef-461a-889c-61ffea674474")
+	)
+	(pad "3" smd roundrect
+		(at 1.25 1)
+		(size 1.2 1)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(roundrect_rratio 0.1)
+		(uuid "abc776f0-6816-4443-a596-fad8645d4ac8")
+	)
+	(pad "4" smd roundrect
+		(at 1.25 -1)
+		(size 1.2 1)
+		(layers "F.Cu" "F.Paste" "F.Mask")
+		(roundrect_rratio 0.1)
+		(uuid "e6e3b1bc-4064-4031-9b80-d1df61337d0a")
+	)
+	(model "${KICAD8_3DMODEL_DIR}/LED_SMD.3dshapes/LED_WS2812B_PLCC4_5.0x5.0mm_P3.2mm.wrl"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)

@@ -22,3 +22,5 @@ target/
 *.gbrjob
 *.drl
 *.zip
+_autosave*
+production/

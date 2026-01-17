@@ -8,22 +8,30 @@ esp-backtrace = { version = "0.14.2", features = [
     "esp32c3",
     "exception-handler",
     "panic-handler",
-    "println",
-]}
-
-esp-hal = { version = "0.22.0", features = [
-    "esp32c3",
+    "println"
 ] }
-esp-println = { version = "0.12.0", features = ["esp32c3", "log"] }
+
+esp-hal = { version = "0.22.0", features = ["esp32c3"] }
+esp-println = { version = "0.12.0", default-features = false, features = ["esp32c3", "log", "jtag-serial", "critical-section", "colors"]}
 log = { version = "0.4.21" }
 esp-alloc = { version = "0.5.0" }
 critical-section = "1.2.0"
-astro-medallion-lib = { path = "../astro-medallion-lib"}
+astro-medallion-lib = { path = "../astro-medallion-lib" }
 embedded-hal = "1.0.0"
 noline = "0.5.1"
-embedded-io = "0.6.1"
 mcp794xx = "0.3.0"
-chrono = { version = "0.4.39", default-features = false, features = ["alloc"] }
+chrono = { version = "0.4.39", default-features = false, features = [
+    "alloc",
+    "serde",
+] }
+esp-storage = { version = "0.4.0", features = ["esp32c3"] }
+embedded-storage = "0.3.1"
+serde = { version = "1.0.219", default-features = false, features = ["derive"] }
+postcard = { version = "1.1.3", features = ["alloc", "postcard-derive"] }
+embedded-io = "0.6.1"
+embed-serial-protocol = { git = "https://github.com/dougli1sqrd/embed-serial-protocol", version = "0.2.1" }
+# embed-serial-protocol = { path = "../../embed-serial-protocol", version = "0.1.2" }
+embedded-hal-nb = "1.0.0"
 
 [profile.dev]
 # Rust debug is too slow.

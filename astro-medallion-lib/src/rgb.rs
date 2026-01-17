@@ -1,10 +1,12 @@
+use core::ops::{Div, Mul};
+
 use embedded_hal::spi::SpiDevice;
 
 
 const ZERO_SYMBOL: u8 = 0b11000000;
 const ONE_SYMBOL: u8 = 0b11111100;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct RGB {
     pub r: u8,
     pub g: u8,
@@ -14,6 +16,10 @@ pub struct RGB {
 impl RGB {
     pub const fn new(r: u8, g: u8, b: u8) -> RGB {
         RGB { r, g, b }
+    }
+
+    pub const fn mult(&self, rhs: f32) -> RGB {
+        RGB::new((self.r as f32 * rhs) as u8, (self.g as f32 * rhs) as u8, (self.b as f32 * rhs) as u8)
     }
 
     pub fn bytes(&self) -> [u8; 3*8] {
@@ -46,6 +52,30 @@ impl RGB {
             }
         }
         x
+    }
+}
+
+impl Mul<u8> for RGB {
+    type Output = RGB;
+
+    fn mul(self, rhs: u8) -> Self::Output {
+        RGB::new(self.r * rhs, self.g * rhs, self.b * rhs)
+    }
+}
+
+impl Div<u8> for RGB {
+    type Output = RGB;
+
+    fn div(self, rhs: u8) -> Self::Output {
+        RGB::new(self.r / rhs, self.g / rhs, self.b / rhs)
+    }
+}
+
+impl Mul<f32> for RGB {
+    type Output = RGB;
+
+    fn mul(self, rhs: f32) -> Self::Output {
+        RGB::new((self.r as f32 * rhs) as u8, (self.g as f32 * rhs) as u8, (self.b as f32 * rhs) as u8)
     }
 }
 
